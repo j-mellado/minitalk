@@ -1,61 +1,85 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmellado <jmellado@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/06 02:00:20 by jmellado          #+#    #+#             */
+/*   Updated: 2025/08/06 02:00:21 by jmellado         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
-#include <signal.h>
-#include <stdlib.h>
-#include <sys/types.h>
 
-void send_char(pid_t pid, char c)
+void	send_char(pid_t pid, char c)
 {
-    int bit;
-    int i;
+	int	bit;
+	int	i;
 
-    i = 7;  // Empezar desde el bit más significativo
-    while (i >= 0)
-    {
-        bit = (c >> i) & 1;  // Extraer el bit en posición i
-        
-        if (bit == 1)
-            kill(pid, SIGUSR1);  // Enviar SIGUSR1 para bit 1
-        else
-            kill(pid, SIGUSR2);  // Enviar SIGUSR2 para bit 0
-            
-        usleep(1000);  // Pausa de 1ms entre señales
-        i--;
-    }
+	i = 7;
+	while (i >= 0)
+	{
+		bit = (c >> i) & 1;
+		if (bit == 1)
+		{
+			if (kill(pid, SIGUSR1) == -1)
+			{
+				ft_printf("Error: Could not send SIGUSR1\n");
+				exit(1);
+			}
+		}
+		else
+		{
+			if (kill(pid, SIGUSR2) == -1)
+			{
+				ft_printf("Error: Could not send SIGUSR2\n");
+				exit(1);
+			}
+		}
+		usleep(1000);
+		i--;
+	}
 }
 
-void send_message(pid_t pid, char *message)
+void	send_message(pid_t pid, char *message)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (message[i])
-    {
-        ft_printf("Enviando carácter: '%c'\n", message[i]);
-        send_char(pid, message[i]);
-        i++;
-    }
-    
-    // Enviar carácter nulo para marcar fin del mensaje
-    ft_printf("Enviando fin de mensaje...\n");
-    send_char(pid, '\0');
+	i = 0;
+	while (message[i])
+	{
+		ft_printf("Sending character: '%c'\n", message[i]);
+		send_char(pid, message[i]);
+		i++;
+	}
+	ft_printf("Sending end of message...\n");
+	send_char(pid, '\0');
 }
 
-int main(int argc, char** argv)
+int	main(int argc, char **argv)
 {
-    pid_t pid;
-    
-    if (argc != 3)
-    {
-        ft_printf("Error: Use ./client <PID> <mensaje>\n");
-        return 1;
-    }
+	pid_t pid;
 
-    pid = atoi(argv[1]);
-    ft_printf("Cliente enviando mensaje al PID: %d\n", pid);
-    ft_printf("Mensaje: %s\n", argv[2]);
-    
-    send_message(pid, argv[2]);
-    ft_printf("Mensaje enviado completamente.\n");
-    
-    return 0;
+	if (argc != 3)
+	{
+		ft_printf("Error: Use ./client <PID> <message>\n");
+		return (1);
+	}
+
+	pid = atoi(argv[1]);
+
+	if (pid <= 0)
+	{
+		ft_printf("Error: Invalid PID\n");
+		return (1);
+	}
+
+	ft_printf("Client sending message to PID: %d\n", pid);
+	ft_printf("Message: %s\n", argv[2]);
+
+	send_message(pid, argv[2]);
+	ft_printf("Message sent successfully.\n");
+
+	return (0);
 }
