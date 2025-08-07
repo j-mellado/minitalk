@@ -1,62 +1,122 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: jmellado <jmellado@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/08/06 00:00:00 by jmellado          #+#    #+#              #
-#    Updated: 2025/08/06 01:39:14 by jmellado         ###   ########.fr        #
-#                                                                             #
-# **************************************************************************** #
-
-NAME_SERVER = server
-NAME_CLIENT = client
-
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror
 
 
-SRCS_SERVER = server.c
-SRCS_CLIENT = client.c
-SRCS_PRINTF = src/ft_printf/ft_printf.c \
-              src/ft_printf/ft_printf_hex.c \
-              src/ft_printf/ft_printf_number.c \
-              src/ft_printf/ft_printf_pointer.c \
-              src/ft_printf/ft_printf_string.c \
-              src/ft_printf/ft_printf_unsigned.c \
-              src/ft_printf/ft_putchar.c
 
-OBJS_SERVER = $(SRCS_SERVER:.c=.o) $(SRCS_PRINTF:.c=.o)
-OBJS_CLIENT = $(SRCS_CLIENT:.c=.o) $(SRCS_PRINTF:.c=.o)
 
-GREEN = \033[0;32m
-RED = \033[0;31m
-RESET = \033[0m
+SHELL		=	/bin/bash
 
-all: $(NAME_SERVER) $(NAME_CLIENT)
+NAME		= client
+NAMESV		= server
+NAMEBC		= client_bonus
+NAMEBS		= server_bonus
+LIBFT		= libft
+INC		= inc
+HEADER		= -I inc
+SRC_DIR		= src/
+OBJ_DIR		= obj/
+CC		= gcc
+FLAGS		= -Wall -Werror -Wextra
+FSANITIZE	= -fsanitize=address -g3
+RM		= rm -f
+ECHO		= echo -e
 
-$(NAME_SERVER): $(OBJS_SERVER)
-	@echo "$(GREEN)Compiling server...$(RESET)"
-	$(CC) $(CFLAGS) -o $(NAME_SERVER) $(OBJS_SERVER)
-	@echo "$(GREEN)Server compiled successfully!$(RESET)"
+DEF_COLOR	=	\033[0;39m
+ORANGE		=	\033[0;33m
+GRAY		=	\033[0;90m
+RED		=	\033[0;91m
+GREEN		=	\033[1;92m
+YELLOW		=	\033[1;93m
+BLUE		=	\033[0;94m
+MAGENTA		=	\033[0;95m
+CYAN		=	\033[0;96m
+WHITE		=	\033[0;97m
 
-$(NAME_CLIENT): $(OBJS_CLIENT)
-	@echo "$(GREEN)Compiling client...$(RESET)"
-	$(CC) $(CFLAGS) -o $(NAME_CLIENT) $(OBJS_CLIENT)
-	@echo "$(GREEN)Client compiled successfully!$(RESET)"
+SRCCL_FILES	=	client
+SRCSV_FILES	=	server
+SRCBC_FILES	=	client_bonus
+SRCBS_FILES	=	server_bonus
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+SRCCL 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCCL_FILES)))
+OBJCL 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCCL_FILES)))
+
+SRCSV 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCSV_FILES)))
+OBJSV 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCSV_FILES)))
+
+SRCBC 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCBC_FILES)))
+OBJBC 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCBC_FILES)))
+
+SRCBS 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCBS_FILES)))
+OBJBS 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCBS_FILES)))
+
+
+OBJF		=	.cache_exists
+
+start:
+			@make -C $(LIBFT)
+			@cp $(LIBFT)/libft.a .
+			@$(ECHO) -n "$(YELLOW)[Dependencies]:\t$(DEF_COLOR)"
+			@$(ECHO) -n "$(RED)[$(DEF_COLOR)"
+			@make all
+
+all:		$(NAME) $(NAMESV)
+
+$(NAME):	$(OBJCL) $(OBJF)
+			@$(CC) $(FLAGS) $(OBJCL) $(HEADER) libft.a -o $(NAME)
+
+$(NAMESV):	$(OBJSV) $(OBJF)
+			@$(ECHO) -n "$(RED)]$(DEF_COLOR)"
+			@$(ECHO) -n "$(GREEN) => 100%$(DEF_COLOR)\n"
+			@$(ECHO) -n "$(YELLOW)[minitalk]:\t$(DEF_COLOR)"
+			@$(CC) $(FLAGS) $(OBJSV) $(HEADER) libft.a -o $(NAMESV)
+			@$(ECHO) "$(GREEN) => Success!$(DEF_COLOR)"
+
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c $(OBJF)
+			@$(ECHO) -n "$(ORANGE)=$(DEF_COLOR)"
+			@$(CC) $(FLAGS) $(HEADER) -c $< -o $@
+
+$(OBJF):
+			@mkdir -p $(OBJ_DIR)
+			@touch $(OBJF)
+
+bonus:
+			@make -C $(LIBFT)
+			@cp $(LIBFT)/libft.a .
+			@$(ECHO) -n "$(YELLOW)[Dependencies]:\t$(DEF_COLOR)"
+			@$(ECHO) -n "$(RED)[$(DEF_COLOR)"
+			@make allbonus
+
+allbonus:		$(NAMEBC) $(NAMEBS)
+
+$(NAMEBC):	$(OBJBC) $(OBJF)
+			@$(CC) $(FLAGS) $(OBJBC) $(HEADER) libft.a -o $(NAMEBC)
+
+$(NAMEBS):	$(OBJBS) $(OBJF)
+			@$(ECHO) -n "$(RED)]$(DEF_COLOR)"
+			@$(ECHO) -n "$(GREEN) => 100%$(DEF_COLOR)\n"
+			@$(ECHO) -n "$(YELLOW)[minitalk_bonus]:\t$(DEF_COLOR)"
+			@$(CC) $(FLAGS) $(OBJBS) $(HEADER) libft.a -o $(NAMEBS)
+			@$(ECHO) "$(GREEN) => Success!$(DEF_COLOR)"
 
 clean:
-	@echo "$(RED)Cleaning object files...$(RESET)"
-	rm -f $(OBJS_SERVER) $(OBJS_CLIENT)
+			@$(RM) -r $(OBJ_DIR)
+			@$(RM) $(OBJF)
+			@make clean -C $(LIBFT)
+			@$(ECHO) -n "$(BLUE)[minitalk]:\tobject files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
 
-fclean: clean
-	@echo "$(RED)Cleaning executables...$(RESET)"
-	rm -f $(NAME_SERVER) $(NAME_CLIENT)
+fclean:		clean
+			@$(RM) $(NAME) $(NAMESV) $(NAMEBC) $(NAMEBS)
+			@$(RM) $(LIBFT)/libft.a
+			@$(RM) libft.a
+			@find . -name ".DS_Store" -delete
+			@$(ECHO) -n "$(CYAN)[LIBFT]:\texec. files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
+			@$(ECHO) -n "$(CYAN)[minitalk]:\texec. files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
 
-re: fclean all
 
-.PHONY: all clean fclean re
+re:			fclean all
+			@$(ECHO) -n "$(GREEN)Cleaned and rebuilt everything for [minitalk]!$(DEF_COLOR)\n"
+
+norm:
+			@clear
+			@norminette $(SRC) $(INC) $(LIBFT) | grep -v Norme -B1 || true
+
+.PHONY:		start all clean fclean re bonus norm
+
