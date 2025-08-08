@@ -1,6 +1,24 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmellado <jmellado@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/08 17:44:10 by jmellado          #+#    #+#             */
+/*   Updated: 2025/08/08 19:43:12 by jmellado         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minitalk.h"
+
+volatile sig_atomic_t	g_ack_received = 0;
+
+void	ft_ack_handler(int signum)
+{
+	(void)signum;
+	g_ack_received = 1;
+}
 
 void	ft_send_bits(int pid, char i)
 {
@@ -9,11 +27,13 @@ void	ft_send_bits(int pid, char i)
 	bit = 0;
 	while (bit < 8)
 	{
+		g_ack_received = 0;
 		if ((i & (0x01 << bit)) != 0)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		usleep(100);
+		while (g_ack_received == 0)
+			pause();
 		bit++;
 	}
 }
@@ -26,6 +46,7 @@ int	main(int argc, char **argv)
 	i = 0;
 	if (argc == 3)
 	{
+		signal(SIGUSR1, ft_ack_handler);
 		pid = ft_atoi(argv[1]);
 		while (argv[2][i] != '\0')
 		{

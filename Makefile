@@ -1,28 +1,33 @@
-
-
-
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: jmellado <jmellado@student.42malaga.com    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/08/08 17:43:55 by jmellado          #+#    #+#              #
+#    Updated: 2025/08/08 19:46:19 by jmellado         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
 SHELL		=	/bin/bash
 
 NAME		= client
 NAMESV		= server
-NAMEBC		= client_bonus
-NAMEBS		= server_bonus
 LIBFT		= libft
-INC		= inc
-HEADER		= -I inc
+INC			= inc
+HEADER		= -I $(INC)
 SRC_DIR		= src/
 OBJ_DIR		= obj/
-CC		= gcc
-FLAGS		= -Wall -Werror -Wextra
-FSANITIZE	= -fsanitize=address -g3
-RM		= rm -f
+CC			= gcc
+FLAGS		= -Wall -Werror -Wextra 
+RM			= rm -f
 ECHO		= echo -e
 
 DEF_COLOR	=	\033[0;39m
 ORANGE		=	\033[0;33m
 GRAY		=	\033[0;90m
-RED		=	\033[0;91m
+RED			=	\033[0;91m
 GREEN		=	\033[1;92m
 YELLOW		=	\033[1;93m
 BLUE		=	\033[0;94m
@@ -32,37 +37,32 @@ WHITE		=	\033[0;97m
 
 SRCCL_FILES	=	client
 SRCSV_FILES	=	server
-SRCBC_FILES	=	client_bonus
-SRCBS_FILES	=	server_bonus
 
-SRCCL 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCCL_FILES)))
-OBJCL 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCCL_FILES)))
+SRCCL		=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCCL_FILES)))
+OBJCL		=	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCCL_FILES)))
 
-SRCSV 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCSV_FILES)))
-OBJSV 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCSV_FILES)))
-
-SRCBC 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCBC_FILES)))
-OBJBC 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCBC_FILES)))
-
-SRCBS 		= 	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCBS_FILES)))
-OBJBS 		= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCBS_FILES)))
-
+SRCSV		=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRCSV_FILES)))
+OBJSV		=	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRCSV_FILES)))
 
 OBJF		=	.cache_exists
 
 start:
-			@make -C $(LIBFT)
-			@cp $(LIBFT)/libft.a .
-			@$(ECHO) -n "$(YELLOW)[Dependencies]:\t$(DEF_COLOR)"
-			@$(ECHO) -n "$(RED)[$(DEF_COLOR)"
 			@make all
 
-all:		$(NAME) $(NAMESV)
+all:		libft.a $(NAME) $(NAMESV)
 
-$(NAME):	$(OBJCL) $(OBJF)
+libft.a:
+		@make -C $(LIBFT)
+		@cp $(LIBFT)/libft.a .
+
+$(NAME):	$(OBJCL) $(OBJF) libft.a
+			@$(ECHO) -n "$(RED)]$(DEF_COLOR)"
+			@$(ECHO) -n "$(GREEN) => 100%$(DEF_COLOR)\n"
+			@$(ECHO) -n "$(YELLOW)[minitalk]:\t$(DEF_COLOR)"
 			@$(CC) $(FLAGS) $(OBJCL) $(HEADER) libft.a -o $(NAME)
+			@$(ECHO) "$(GREEN) => Success!$(DEF_COLOR)"
 
-$(NAMESV):	$(OBJSV) $(OBJF)
+$(NAMESV):	$(OBJSV) $(OBJF) libft.a
 			@$(ECHO) -n "$(RED)]$(DEF_COLOR)"
 			@$(ECHO) -n "$(GREEN) => 100%$(DEF_COLOR)\n"
 			@$(ECHO) -n "$(YELLOW)[minitalk]:\t$(DEF_COLOR)"
@@ -77,16 +77,6 @@ $(OBJF):
 			@mkdir -p $(OBJ_DIR)
 			@touch $(OBJF)
 
-$(NAMEBC):	$(OBJBC) $(OBJF)
-			@$(CC) $(FLAGS) $(OBJBC) $(HEADER) libft.a -o $(NAMEBC)
-
-$(NAMEBS):	$(OBJBS) $(OBJF)
-			@$(ECHO) -n "$(RED)]$(DEF_COLOR)"
-			@$(ECHO) -n "$(GREEN) => 100%$(DEF_COLOR)\n"
-			@$(ECHO) -n "$(YELLOW)[minitalk_bonus]:\t$(DEF_COLOR)"
-			@$(CC) $(FLAGS) $(OBJBS) $(HEADER) libft.a -o $(NAMEBS)
-			@$(ECHO) "$(GREEN) => Success!$(DEF_COLOR)"
-
 clean:
 			@$(RM) -r $(OBJ_DIR)
 			@$(RM) $(OBJF)
@@ -94,13 +84,11 @@ clean:
 			@$(ECHO) -n "$(BLUE)[minitalk]:\tobject files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
 
 fclean:		clean
-			@$(RM) $(NAME) $(NAMESV) $(NAMEBC) $(NAMEBS)
-			@$(RM) $(LIBFT)/libft.a
+			@$(RM) $(NAME) $(NAMESV)
 			@$(RM) libft.a
-			@find . -name ".DS_Store" -delete
+			@make fclean -C $(LIBFT)
 			@$(ECHO) -n "$(CYAN)[LIBFT]:\texec. files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
 			@$(ECHO) -n "$(CYAN)[minitalk]:\texec. files$(DEF_COLOR)$(GREEN)  => Cleaned!$(DEF_COLOR)\n"
-
 
 re:			fclean all
 			@$(ECHO) -n "$(GREEN)Cleaned and rebuilt everything for [minitalk]!$(DEF_COLOR)\n"
@@ -109,5 +97,4 @@ norm:
 			@clear
 			@norminette $(SRC) $(INC) $(LIBFT) | grep -v Norme -B1 || true
 
-.PHONY:		start all clean fclean re bonus norm
-
+.PHONY:		start all clean fclean re norm
