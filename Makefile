@@ -77,15 +77,6 @@ $(OBJF):
 			@mkdir -p $(OBJ_DIR)
 			@touch $(OBJF)
 
-bonus:
-			@make -C $(LIBFT)
-			@cp $(LIBFT)/libft.a .
-			@$(ECHO) -n "$(YELLOW)[Dependencies]:\t$(DEF_COLOR)"
-			@$(ECHO) -n "$(RED)[$(DEF_COLOR)"
-			@make allbonus
-
-allbonus:		$(NAMEBC) $(NAMEBS)
-
 $(NAMEBC):	$(OBJBC) $(OBJF)
 			@$(CC) $(FLAGS) $(OBJBC) $(HEADER) libft.a -o $(NAMEBC)
 
